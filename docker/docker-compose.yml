@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  deepseek-ocr:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: deepseek-ocr
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - FLASK_DEBUG=false
+      - USE_LOCAL_MODEL=true
+      - DEVICE=cuda
+      - HOST=0.0.0.0
+      - PORT=5000
+      - LOG_LEVEL=INFO
+    volumes:
+      - ../uploads:/app/uploads
+      - ../results:/app/results
+      - ../logs:/app/logs
+      - ../models:/app/models
+      - ../config:/app/config
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+    networks:
+      - deepseek-network
+
+  # Optional: Add Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: deepseek-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - deepseek-network
+
+  # Optional: Add Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: deepseek-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - deepseek-ocr
+    restart: unless-stopped
+    networks:
+      - deepseek-network
+
+volumes:
+  redis_data:
+
+networks:
+  deepseek-network:
+    driver: bridge

@@ -1,0 +1,65 @@
+# DeepSeek OCR Configuration
+server:
+  host: "0.0.0.0"
+  port: 5000
+  debug: false
+  secret_key: "your-secret-key-change-this"
+
+# Model Configuration
+model:
+  name: "deepseek-vl-7b-chat"
+  use_local: false  # Set to true if you have the model downloaded locally
+  local_path: "./models/deepseek-vl-7b-chat"
+  device: "cuda"  # cuda, cpu, auto
+  precision: "fp16"  # fp16, fp32, int8
+  max_length: 4096
+  temperature: 0.1
+
+# API Configuration
+api:
+  deepseek_api_key: ""  # Get your API key from https://platform.deepseek.com/
+  openai_api_base: "https://api.deepseek.com"
+  rate_limit: 60  # requests per minute
+  timeout: 30  # seconds
+
+# Upload Configuration
+upload:
+  max_file_size: 52428800  # 50MB in bytes
+  allowed_extensions: ["jpg", "jpeg", "png", "bmp", "tiff", "pdf", "webp", "gif"]
+  upload_folder: "./uploads"
+  results_folder: "./results"
+  cleanup_after: 3600  # seconds
+
+# OCR Configuration
+ocr:
+  confidence_threshold: 0.5
+  max_image_size: 4096
+  preprocessing:
+    enabled: true
+    resize: true
+    denoise: true
+    enhance_contrast: true
+  fallback_engines: ["easyocr", "tesseract"]
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  file: "./logs/deepseek_ocr.log"
+  rotation: "10 MB"
+  retention: "30 days"
+  format: "{time:YYYY-MM-DD HH:mm:ss} | {level} | {name}:{function}:{line} | {message}"
+
+# Performance Configuration
+performance:
+  batch_size: 1
+  max_workers: 4
+  cache_enabled: true
+  cache_ttl: 3600  # seconds
+  gpu_memory_fraction: 0.8
+
+# Security Configuration
+security:
+  max_requests_per_ip: 100
+  request_window: 3600  # seconds
+  allowed_origins: ["*"]
+  csrf_protection: true
